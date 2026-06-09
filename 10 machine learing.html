@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>機器學習 10 大經典圖表與模型評估深度解析手冊</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathJax for Elegant LaTeX rendering -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* 導航與側邊欄 */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 4px;
+        }
+
+        /* 數學公式容器滾動 */
+        .mjx-container {
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        /* 列印格式優化 */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background-color: white !important;
+                color: black !important;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            .shadow-lg,
+            .shadow-md {
+                box-shadow: none !important;
+            }
+
+            .border-slate-700 {
+                border-color: #e2e8f0 !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 transition-colors duration-300">
+
+    <!-- 頂部狀態欄 (僅螢幕顯示) -->
+    <div
+        class="no-print bg-indigo-900/40 border-b border-indigo-500/20 px-6 py-2.5 text-xs text-indigo-200 flex justify-between items-center z-50 sticky top-0 backdrop-blur-md">
+        <div class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+            <span><strong>學術高階版研讀教材</strong> • 機器學習 10 大核心圖表深度解碼</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="toggleTheme()"
+                class="hover:text-white transition-colors flex items-center gap-1.5 font-medium">
+                <i class="fa-solid fa-circle-half-stroke"></i> <span id="theme-text">學術白紙模式</span>
+            </button>
+            <button onclick="window.print()"
+                class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded transition-colors font-medium">
+                <i class="fa-solid fa-file-pdf mr-1"></i> 列印 / 導出 PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="flex min-h-screen">
+
+        <!-- 左側導航側邊欄 (僅螢幕顯示) -->
+        <aside
+            class="no-print w-80 bg-slate-900 border-r border-slate-800 p-6 hidden xl:flex flex-col sticky top-10 h-[calc(100vh-40px)] z-40 sidebar-scroll overflow-y-auto">
+            <div class="mb-8">
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">教材全域結構</h3>
+                <h1 class="text-lg font-black text-white tracking-tight flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-indigo-500"></i> ML 評估視覺化手冊
+                </h1>
+            </div>
+
+            <nav class="space-y-1.5 flex-1 text-sm">
+                <a href="#intro"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all group">
+                    <span class="w-6 text-center group-hover:scale-110 transition-transform"><i
+                            class="fa-solid fa-book-open text-indigo-400"></i></span>
+                    <span class="font-medium">導言：視覺化的力量</span>
+                </a>
+
+                <div class="pt-4 pb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">核心章節</div>
+
+                <a href="#ch1"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+                    <span class="text-xs bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono">01</span>
+                    <span class="truncate">線性迴歸與殘差分析圖</span>
+                </a>
+                <a href="#ch2"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+                    <span class="text-xs bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono">02</span>
+                    <span class="truncate">邏輯斯迴歸與 ROC 曲線</span>
+                </a>
+                <a href="#ch3"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+                    <span class="text-xs bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono">03</span>
+                    <span class="truncate">決策樹與空間劃分邊界</span>
+                </a>
+                <a href="#ch4"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+                    <span class="text-xs bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono">04</span>
+                    <span class="truncate">隨機森林與特徵重要性</span>
+                </a>
+                <a href="#ch5"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+                    <span class="text-xs bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono">05</span>
+                    <span class="truncate">支援向量機與決策超平面</span>
+                </a>
+                <a href="#ch6"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+                    <span class="text-xs bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono">06</span>
+                    <span class="truncate">K-最近鄰與距離度量分析</span>
+                </a>
+                <a href="#ch7"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+                    <span class="text-xs bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono">07</span>
+                    <span class="truncate">K-Means 與肘部收斂法</span>
+                </a>
+                <a href="#ch8"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+                    <span class="text-xs bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono">08</span>
+                    <span class="truncate">單純貝氏與 PR 曲線</span>
+                </a>
+                <a href="#ch9"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+                    <span class="text-xs bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono">09</span>
+                    <span class="truncate">梯度提升樹與訓練收斂線</span>
+                </a>
+                <a href="#ch10"
+                    class="flex items-center gap-2.5 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+                    <span class="text-xs bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono">10</span>
+                    <span class="truncate">神經網路與學習曲線</span>
+                </a>
+            </nav>
+            <div class="mt-auto border-t border-slate-800 pt-4 text-center">
+                <span class="text-[10px] text-slate-500">© 2026 學術出版級教材發行</span>
+            </div>
+        </aside>
+
+        <!-- 主體內容區 -->
+        <main class="flex-1 px-4 py-8 md:p-12 lg:p-16 max-w-5xl mx-auto overflow-hidden">
+
+            <!-- 封面與前言 -->
+            <section id="intro" class="mb-16 border-b border-slate-800 pb-12">
+                <div class="text-center md:text-left mb-8">
+                    <span
+                        class="bg-indigo-500/10 text-indigo-400 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-widest no-print">Academic
+                        Standard Edition</span>
+                    <h1 class="text-4xl md:text-5xl font-black tracking-tight text-white mt-4 mb-3 leading-tight">機器學習
+                        10 大經典圖表<br>與模型評估深度解析手冊</h1>
+                    <p class="text-lg text-slate-400 font-light max-w-2xl">一份拒絕萬用套路、從底層數學推導到真實 Python 數據視覺化實踐的極致指南。</p>
+                </div>
+
+                <div class="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl mb-8">
+                    <h3 class="text-md font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> 本手冊編寫宗旨
+                    </h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        在當前的資料科學與 AI 行業中，許多初學者常陷入「直接調用 API（調包）」的淺層學習陷阱。
+                        當面對複雜業務時，因無法合理解讀評估圖表的幾何與數學意義而導致模型部署失敗。
+                        本手冊<strong>絕不灌水、拒絕套用重覆範本</strong>，我們為 10 大核心演算法各自設計了專屬的數學原理探討、互動式 Chart.js 實時圖形演示、高質量 Python
+                        實作程式碼、真實案例剖析與思考習題，旨在協助您融會貫通。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 1. 線性迴歸與殘差分析圖 -->
+            <section id="ch1" class="mb-20 page-break">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl font-black font-mono text-indigo-500">01</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white">線性迴歸與殘差分析圖 (Residuals Plot)</h2>
+                </div>
+
+                <div
+                    class="prose prose-invert max-w-none text-slate-300 text-sm md:text-base leading-relaxed space-y-4">
+                    <p>
+                        <strong>線性迴歸（Linear Regression）</strong>旨在尋找自變量 $X$ 與連續目標值 $Y$
+                        之間的最佳線性組合。在經典統計學中，我們使用最小二乘法（Ordinary Least Squares, OLS）進行參數估計。
+                    </p>
+                    <p>
+                        給定設計矩陣 $X \in \mathbb{R}^{N \times (D+1)}$（含偏置項列）與真實標籤 $y \in \mathbb{R}^N$，優化目標函數（殘差平方和）為：
+                    </p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$L(w) = \frac{1}{2} \|y - Xw\|^2_2 = \frac{1}{2} (y^T y - 2 w^T X^T y + w^T X^T X w)$$
+                    </div>
+                    <p>對 $w$ 進行矩陣求導並令其為零，可解得全局唯一解析解：</p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$w^* = (X^T X)^{-1} X^T y$$
+                    </div>
+                    <p>
+                        <strong>殘差診斷意義</strong>：評估迴歸模型好壞，不能僅看 $R^2$。殘差（$e_i = y_i - \hat{y}_i$）必須符合<strong>同方差假設
+                            (Homoscedasticity)</strong>，即殘差必須隨機且均勻地分布在 $Y=0$ 兩側。若出現漏斗狀或拋物線形，則表示存在異質變異數或遺漏了高階非線性特徵。
+                    </p>
+                </div>
+
+                <!-- 互動圖表 -->
+                <div class="my-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                        <h4 class="text-xs font-bold text-slate-400 mb-2 uppercase">線性擬合關係線</h4>
+                        <div class="h-60"><canvas id="canvasCh1Fit"></canvas></div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                        <h4 class="text-xs font-bold text-slate-400 mb-2 uppercase">殘差診斷分佈（理想同方差）</h4>
+                        <div class="h-60"><canvas id="canvasCh1Residual"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Python實作 -->
+                <div class="my-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                        <div
+                            class="bg-slate-800/80 px-4 py-2 text-xs font-bold text-slate-300 flex justify-between items-center border-b border-slate-700">
+                            <span><i class="fa-brands fa-python mr-1 text-yellow-500"></i> sklearn_regression.py</span>
+                            <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded">實作代碼</span>
+                        </div>
+                        <pre class="p-4 text-xs overflow-x-auto text-emerald-400 code-block bg-slate-950"><code>import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
+# 建立模型並擬合
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# 計算預測值與殘差
+y_pred = model.predict(X_test)
+residuals = y_test - y_pred
+
+# 繪製殘差圖
+plt.scatter(y_pred, residuals, alpha=0.5, color='indigo')
+plt.axhline(y=0, color='red', linestyle='--')
+plt.xlabel('Predicted Values')
+plt.ylabel('Residuals')
+plt.show()</code></pre>
+                    </div>
+                </div>
+
+                <!-- 習題 -->
+                <div class="border-l-4 border-indigo-500 bg-indigo-950/20 p-4 rounded-r-xl my-4 text-sm">
+                    <p class="font-bold text-indigo-400 mb-1">思考與習題：</p>
+                    <p class="text-slate-300">如果殘差圖呈現明顯的「向右開口漏斗狀」，這在統計學上稱為什麼？應該使用何種數學轉換（如對數轉換）來修正？</p>
+                </div>
+            </section>
+
+            <!-- 2. 邏輯斯迴歸與 ROC 曲線 -->
+            <section id="ch2" class="mb-20 page-break">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl font-black font-mono text-indigo-500">02</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white">邏輯斯迴歸與 ROC 曲線 (ROC Curve & AUC)</h2>
+                </div>
+
+                <div
+                    class="prose prose-invert max-w-none text-slate-300 text-sm md:text-base leading-relaxed space-y-4">
+                    <p>
+                        <strong>邏輯斯迴歸（Logistic Regression）</strong>本質上是二分類模型。它通過引入**對數幾率（Log-Odds / Logit）**將預測空間壓縮至機率區間
+                        $[0, 1]$：
+                    </p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$\ln\left(\frac{p}{1-p}\right) = w^T x \implies p = \sigma(w^T x) = \frac{1}{1 + e^{-w^T x}}$$
+                    </div>
+                    <p>利用**極大似然估計 (MLE)**，其對應的優化目標為最小化二元交叉熵損失（Binary Cross-Entropy Loss）：</p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$J(w) = -\frac{1}{N} \sum_{i=1}^{N} \left[ y_i \ln(p_i) + (1-y_i) \ln(1-p_i) \right]$$
+                    </div>
+                    <p>
+                        <strong>ROC 曲線與 AUC</strong>：ROC 曲線的橫軸為偽陽性率（$\text{FPR} =
+                        \frac{\text{FP}}{\text{FP+TN}}$），縱軸為真陽性率（$\text{TPR} = \frac{\text{TP}}{\text{TP+FN}}$）。我們藉由在
+                        $[0,1]$ 區間內平移分類閾值，來記錄對應的點位。曲線下面積（AUC）越接近 1.0，代表分類器區分正負樣本的能力越強。
+                    </p>
+                </div>
+
+                <!-- 互動圖表 -->
+                <div class="my-8 bg-slate-900 border border-slate-800 p-6 rounded-xl">
+                    <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase">ROC 曲線與對角猜測基準線 (ROC Curve & AUC)</h4>
+                    <div class="h-72"><canvas id="canvasCh2ROC"></canvas></div>
+                </div>
+
+                <!-- Python實作 -->
+                <div class="my-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                        <div
+                            class="bg-slate-800/80 px-4 py-2 text-xs font-bold text-slate-300 flex justify-between items-center border-b border-slate-700">
+                            <span><i class="fa-brands fa-python mr-1 text-yellow-500"></i> sklearn_roc.py</span>
+                            <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded">實作代碼</span>
+                        </div>
+                        <pre class="p-4 text-xs overflow-x-auto text-emerald-400 code-block bg-slate-950"><code>from sklearn.metrics import roc_curve, auc
+
+# 獲取預測正類之機率值
+y_scores = model.predict_proba(X_test)[:, 1]
+fpr, tpr, thresholds = roc_curve(y_test, y_scores)
+roc_auc = auc(fpr, tpr)
+
+# 繪圖展示 (AUC 值越大越佳)
+print(f"ROC Area Under Curve (AUC): {roc_auc:.4f}")</code></pre>
+                    </div>
+                </div>
+
+                <!-- 習題 -->
+                <div class="border-l-4 border-indigo-500 bg-indigo-950/20 p-4 rounded-r-xl my-4 text-sm">
+                    <p class="font-bold text-indigo-400 mb-1">思考與習題：</p>
+                    <p class="text-slate-300">為什麼在不平衡數據集中（例如違約案件僅佔 0.1%），ROC 曲線有時無法客觀展現分類器對正類的預測表現？這時應該改用什麼曲線？</p>
+                </div>
+            </section>
+
+            <!-- 3. 決策樹與空間劃分邊界 -->
+            <section id="ch3" class="mb-20 page-break">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl font-black font-mono text-indigo-500">03</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white">決策樹與空間劃分邊界 (Decision Boundary)</h2>
+                </div>
+
+                <div
+                    class="prose prose-invert max-w-none text-slate-300 text-sm md:text-base leading-relaxed space-y-4">
+                    <p>
+                        <strong>決策樹（Decision Tree）</strong>是一種非參數監督式學習算法。其核心思想是通過遞歸分割特徵空間，使得分割後的各子集純度（Purity）達到最高。
+                    </p>
+                    <p>
+                        我們使用<strong>資訊熵（Information Entropy）</strong>或<strong>基尼不純度（Gini
+                            Impurity）</strong>來度量集合的不確定性。給定當前節點數據集 $D$：
+                    </p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$\text{Entropy}(D) = -\sum_{k=1}^{K} p_k \log_2(p_k), \quad \text{Gini}(D) = 1 - \sum_{k=1}^{K}
+                        p_k^2$$
+                    </div>
+                    <p>
+                        <strong>分裂特點與空間邊界</strong>：決策樹的分裂決策本質上是對單一維度特徵進行不平衡切分（即 $X_j >
+                        \theta$）。因此，決策樹在二維特徵平面上劃分出的決策邊界，必定是**正交階梯狀的直線**。這與曲線或超平面劃分模型具有本質上的幾何差異。
+                    </p>
+                </div>
+
+                <!-- 互動圖表 -->
+                <div class="my-8 bg-slate-900 border border-slate-800 p-6 rounded-xl">
+                    <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase">決策樹正交空間劃分邊界圖</h4>
+                    <div class="h-72"><canvas id="canvasCh3Boundary"></canvas></div>
+                </div>
+
+                <!-- Python實作 -->
+                <div class="my-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                        <div
+                            class="bg-slate-800/80 px-4 py-2 text-xs font-bold text-slate-300 flex justify-between items-center border-b border-slate-700">
+                            <span><i class="fa-brands fa-python mr-1 text-yellow-500"></i> dtree_visual.py</span>
+                            <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded">實作代碼</span>
+                        </div>
+                        <pre class="p-4 text-xs overflow-x-auto text-emerald-400 code-block bg-slate-950"><code>from sklearn.tree import DecisionTreeClassifier
+import numpy as np
+
+# 限制樹的最大深度，防止過度擬合與邊界破碎
+clf = DecisionTreeClassifier(max_depth=3, random_state=42)
+clf.fit(X_train, y_train)
+
+# 使用 meshgrid 計算密集的空間預測矩陣，用以繪製非線性邊界
+xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.01), np.arange(y_min, y_max, 0.01))
+Z = clf.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)</code></pre>
+                    </div>
+                </div>
+
+                <!-- 習題 -->
+                <div class="border-l-4 border-indigo-500 bg-indigo-950/20 p-4 rounded-r-xl my-4 text-sm">
+                    <p class="font-bold text-indigo-400 mb-1">思考與習題：</p>
+                    <p class="text-slate-300">若訓練集數據在空間中呈同心圓分佈（環形），單個決策樹在不進行任何座標軸轉換的情況下，其預測邊界會呈現何種狀態？為什麼其泛化能力會極差？</p>
+                </div>
+            </section>
+
+            <!-- 4. 隨機森林與特徵重要性 -->
+            <section id="ch4" class="mb-20 page-break">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl font-black font-mono text-indigo-500">04</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white">隨機森林與特徵重要性 (Feature Importance)</h2>
+                </div>
+
+                <div
+                    class="prose prose-invert max-w-none text-slate-300 text-sm md:text-base leading-relaxed space-y-4">
+                    <p>
+                        <strong>隨機森林（Random Forest）</strong>是經典的集成學習（Ensemble
+                        Learning）代表，通過結合多個決策樹的預測結果，顯著降低模型的方差（Variance）。它採用了 **Bootstrap Bagging** 與 **隨機特徵採樣** 的雙重隨機化技術。
+                    </p>
+                    <p>
+                        <strong>特徵重要性 (MDI) 原理</strong>：對於森林中的任何一棵決策樹，在非葉子節點 $s$ 處，使用特徵 $X_j$ 分裂前與分裂後的基尼不純度減少量為 $\Delta
+                        \text{Gini}(s)$。全體樹在特徵 $X_j$ 分裂時所帶來的基尼不純度總體下降期望值，即為該特徵的重要度：
+                    </p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$\text{Importance}(X_j) = \frac{1}{|M|} \sum_{T \in M} \sum_{s \in T, v(s)=X_j} p(s) \Delta
+                        \text{Gini}(s)$$
+                    </div>
+                </div>
+
+                <!-- 互動圖表 -->
+                <div class="my-8 bg-slate-900 border border-slate-800 p-6 rounded-xl">
+                    <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase">模型特徵重要度權重分析（Gini Importance）</h4>
+                    <div class="h-72"><canvas id="canvasCh4Importance"></canvas></div>
+                </div>
+
+                <!-- Python實作 -->
+                <div class="my-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                        <div
+                            class="bg-slate-800/80 px-4 py-2 text-xs font-bold text-slate-300 flex justify-between items-center border-b border-slate-700">
+                            <span><i class="fa-brands fa-python mr-1 text-yellow-500"></i> rf_importance.py</span>
+                            <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded">實作代碼</span>
+                        </div>
+                        <pre class="p-4 text-xs overflow-x-auto text-emerald-400 code-block bg-slate-950"><code>from sklearn.ensemble import RandomForestClassifier
+
+# 初始化森林
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+
+# 獲取重要度矩陣
+importances = rf.feature_importances_
+# 重要度權重加總必定為 1.0</code></pre>
+                    </div>
+                </div>
+
+                <!-- 習題 -->
+                <div class="border-l-4 border-indigo-500 bg-indigo-950/20 p-4 rounded-r-xl my-4 text-sm">
+                    <p class="font-bold text-indigo-400 mb-1">思考與習題：</p>
+                    <p class="text-slate-300">基於基尼不純度下降的特徵重要性，對於「高基數（Cardinarity）特徵」（如用戶
+                        ID、身份證號等取值種類極多的變量）會產生什麼偏見？我們該如何解決？</p>
+                </div>
+            </section>
+
+            <!-- 5. 支援向量機與決策超平面 -->
+            <section id="ch5" class="mb-20 page-break">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl font-black font-mono text-indigo-500">05</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white">支援向量機與最大間隔超平面 (SVM Margin)</h2>
+                </div>
+
+                <div
+                    class="prose prose-invert max-w-none text-slate-300 text-sm md:text-base leading-relaxed space-y-4">
+                    <p>
+                        <strong>支援向量機（Support Vector Machine, SVM）</strong>在特徵空間中尋找一個幾何間隔最大的超平面來劃分樣本。
+                    </p>
+                    <p>
+                        對於線性可分數據，優化目標是在滿足約束條件 $y_i (w^T x_i + b) \ge 1$ 的前提下，最大化幾何邊界 $\frac{2}{\|w\|}$，等價於最小化：
+                    </p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$\min_{w, b} \frac{1}{2} \|w\|^2_2$$
+                    </div>
+                    <p>當面臨非線性特徵時，我們引入**核技巧（Kernel Trick）**將低維特徵映射到高維希爾伯特空間。徑向基核函數（RBF）公式為：</p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$K(x_i, x_j) = \exp\left( -\gamma \|x_i - x_j\|^2 \right)$$
+                    </div>
+                </div>
+
+                <!-- 互動圖表 -->
+                <div class="my-8 bg-slate-900 border border-slate-800 p-6 rounded-xl">
+                    <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase">SVM 最大幾何邊界 (Margin) 與支援向量分佈</h4>
+                    <div class="h-72"><canvas id="canvasCh5SVM"></canvas></div>
+                </div>
+
+                <!-- Python實作 -->
+                <div class="my-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                        <div
+                            class="bg-slate-800/80 px-4 py-2 text-xs font-bold text-slate-300 flex justify-between items-center border-b border-slate-700">
+                            <span><i class="fa-brands fa-python mr-1 text-yellow-500"></i> svm_kernel.py</span>
+                            <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded">實作代碼</span>
+                        </div>
+                        <pre class="p-4 text-xs overflow-x-auto text-emerald-400 code-block bg-slate-950"><code>from sklearn.svm import SVC
+
+# 使用高斯核函數 RBF
+svm_clf = SVC(kernel='rbf', C=1.0, gamma='scale')
+svm_clf.fit(X_train, y_train)
+
+# 獲取哪些樣本點是決定模型邊界的關鍵支援向量
+support_vectors = svm_clf.support_vectors_</code></pre>
+                    </div>
+                </div>
+
+                <!-- 習題 -->
+                <div class="border-l-4 border-indigo-500 bg-indigo-950/20 p-4 rounded-r-xl my-4 text-sm">
+                    <p class="font-bold text-indigo-400 mb-1">思考與習題：</p>
+                    <p class="text-slate-300">在 SVM 的損失函數中，正則化懲罰參數 $C$ 越小，模型的軟間隔（Soft Margin）會越寬還是越窄？這會使模型更容易過擬合還是欠擬合？
+                    </p>
+                </div>
+            </section>
+
+            <!-- 6. K-最近鄰與距離度量分析 -->
+            <section id="ch6" class="mb-20 page-break">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl font-black font-mono text-indigo-500">06</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white">K-最近鄰與距離度量分析 (KNN Error Rate)</h2>
+                </div>
+
+                <div
+                    class="prose prose-invert max-w-none text-slate-300 text-sm md:text-base leading-relaxed space-y-4">
+                    <p>
+                        <strong>K-最近鄰（K-Nearest Neighbors, KNN）</strong>是一種基於實例的惰性學習（Lazy
+                        Learning）演算法。預測目標點的類別時，完全依賴特徵空間中與其最近的 $K$ 個鄰近樣本。
+                    </p>
+                    <p>
+                        <strong>距離度量標準</strong>：歐氏距離（$L_2$ Norm）與曼哈頓距離（$L_1$ Norm）：
+                    </p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$d_{\text{Euclidean}}(x, y) = \sqrt{\sum_{d=1}^{D}(x_d - y_d)^2}, \quad d_{\text{Manhattan}}(x,
+                        y) = \sum_{d=1}^{D} |x_d - y_d|$$
+                    </div>
+                    <p>
+                        <strong>K 值的敏感度（偏差-方差權衡）</strong>：當 $K=1$ 時，模型完全契合最近的單個噪聲樣本點，決策邊界破碎，此時模型具有**低偏差、高方差**（極易過擬合）；當
+                        $K$ 極大時，決策空間由全體大數據群體主導，決策邊界過於平滑，此時模型具有**高偏差、低方差**（欠擬合）。
+                    </p>
+                </div>
+
+                <!-- 互動圖表 -->
+                <div class="my-8 bg-slate-900 border border-slate-800 p-6 rounded-xl">
+                    <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase">K 鄰近值選擇與測試集錯誤率曲線 (KNN Bias-Variance
+                        Curve)</h4>
+                    <div class="h-72"><canvas id="canvasCh6KNN"></canvas></div>
+                </div>
+
+                <!-- Python實作 -->
+                <div class="my-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                        <div
+                            class="bg-slate-800/80 px-4 py-2 text-xs font-bold text-slate-300 flex justify-between items-center border-b border-slate-700">
+                            <span><i class="fa-brands fa-python mr-1 text-yellow-500"></i> knn_test.py</span>
+                            <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded">實作代碼</span>
+                        </div>
+                        <pre class="p-4 text-xs overflow-x-auto text-emerald-400 code-block bg-slate-950"><code>from sklearn.neighbors import KNeighborsClassifier
+
+# 通常選擇奇數作為 K 值，防止二分類中出現平票情況
+knn = KNeighborsClassifier(n_neighbors=5, metric='minkowski', p=2)
+knn.fit(X_train, y_train)</code></pre>
+                    </div>
+                </div>
+
+                <!-- 習題 -->
+                <div class="border-l-4 border-indigo-500 bg-indigo-950/20 p-4 rounded-r-xl my-4 text-sm">
+                    <p class="font-bold text-indigo-400 mb-1">思考與習題：</p>
+                    <p class="text-slate-300">什麼是維度災難（Curse of Dimensionality）？在高維空間中，KNN 的歐氏距離計算為什麼會面臨失效？</p>
+                </div>
+            </section>
+
+            <!-- 7. K-Means 與肘部收斂法 -->
+            <section id="ch7" class="mb-20 page-break">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl font-black font-mono text-indigo-500">07</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white">K-Means 與肘部收斂法 (Elbow Method)</h2>
+                </div>
+
+                <div
+                    class="prose prose-invert max-w-none text-slate-300 text-sm md:text-base leading-relaxed space-y-4">
+                    <p>
+                        <strong>K-Means</strong> 是一種非監督式學習（Unsupervised Learning）聚類演算法。其優化目標是尋找 $K$ 個群集質心
+                        $\mu$，使得各樣本點到所屬質心的**群集內誤差平方和（Within-Cluster Sum of Squares, WCSS）**降到最低：
+                    </p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$\text{WCSS} = \sum_{j=1}^{K} \sum_{x_i \in C_j} \|x_i - \mu_j\|^2$$
+                    </div>
+                    <p>
+                        <strong>肘部法則 (Elbow Method) 原理</strong>：隨着群集數量 $K$ 的增加，WCSS 會自然且必然地下降。然而，當 $K$ 小於真實群集數時，$K$
+                        的微小增加會大幅改善聚類的緊湊度（WCSS 急劇下墜）；一旦 $K$ 超過真實群集數，優化邊際效應遞減，WCSS 的下降斜率會突然變緩。此時曲線上的折折點（狀似手肘）即為最佳的聚類數 $K$。
+                    </p>
+                </div>
+
+                <!-- 互動圖表 -->
+                <div class="my-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                        <h4 class="text-xs font-bold text-slate-400 mb-2 uppercase">K-Means 聚類與三簇質心分佈</h4>
+                        <div class="h-60"><canvas id="canvasCh7Clust"></canvas></div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                        <h4 class="text-xs font-bold text-slate-400 mb-2 uppercase">肘部法則定位（拐角處即為最佳 K 值）</h4>
+                        <div class="h-60"><canvas id="canvasCh7Elbow"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Python實作 -->
+                <div class="my-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                        <div
+                            class="bg-slate-800/80 px-4 py-2 text-xs font-bold text-slate-300 flex justify-between items-center border-b border-slate-700">
+                            <span><i class="fa-brands fa-python mr-1 text-yellow-500"></i> kmeans_elbow.py</span>
+                            <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded">實作代碼</span>
+                        </div>
+                        <pre class="p-4 text-xs overflow-x-auto text-emerald-400 code-block bg-slate-950"><code>from sklearn.cluster import KMeans
+
+wcss = []
+for k in range(1, 11):
+    kmeans = KMeans(n_clusters=k, init='k-means++', random_state=42)
+    kmeans.fit(X)
+    wcss.append(kmeans.inertia_) # inertia_ 即為 WCSS</code></pre>
+                    </div>
+                </div>
+
+                <!-- 習題 -->
+                <div class="border-l-4 border-indigo-500 bg-indigo-950/20 p-4 rounded-r-xl my-4 text-sm">
+                    <p class="font-bold text-indigo-400 mb-1">思考與習題：</p>
+                    <p class="text-slate-300">什麼是 K-Means++ 初始化策略？它與傳統的隨機隨機初始化相比，如何克服陷入局部極小值（Local Minima）的問題？</p>
+                </div>
+            </section>
+
+            <!-- 8. 單純貝氏與 PR 曲線 -->
+            <section id="ch8" class="mb-20 page-break">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl font-black font-mono text-indigo-500">08</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white">單純貝氏與 PR 曲線 (Precision-Recall Curve)</h2>
+                </div>
+
+                <div
+                    class="prose prose-invert max-w-none text-slate-300 text-sm md:text-base leading-relaxed space-y-4">
+                    <p>
+                        <strong>單純貝氏（Naive Bayes）</strong>基於機率經典貝氏定理，並做出關鍵的**「特徵條件獨立性假設」**（特徵之間互不干涉）：
+                    </p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$P(Y \mid X) = \frac{P(Y) \prod_{d=1}^{D} P(X_d \mid Y)}{P(X)}$$
+                    </div>
+                    <p>
+                        <strong>精確度-召回率（Precision-Recall）曲線</strong>：相較於 ROC 曲線對不平衡樣本的遲鈍，PR
+                        曲線聚焦於正類。橫軸為召回率（Recall，全體真實正類中檢出多少），縱軸為精確度（Precision，預測為正類中真正準確的比例）。PR 曲線下面積稱為平均精準度（Average
+                        Precision, AP），值越高，代表面對少數派（如癌症、詐欺）的捕捉效能越頂尖。
+                    </p>
+                </div>
+
+                <!-- 互動圖表 -->
+                <div class="my-8 bg-slate-900 border border-slate-800 p-6 rounded-xl">
+                    <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase">不平衡數據集分類器的 Precision-Recall 權衡曲線</h4>
+                    <div class="h-72"><canvas id="canvasCh8PR"></canvas></div>
+                </div>
+
+                <!-- Python實作 -->
+                <div class="my-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                        <div
+                            class="bg-slate-800/80 px-4 py-2 text-xs font-bold text-slate-300 flex justify-between items-center border-b border-slate-700">
+                            <span><i class="fa-brands fa-python mr-1 text-yellow-500"></i> nb_pr_curve.py</span>
+                            <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded">實作代碼</span>
+                        </div>
+                        <pre class="p-4 text-xs overflow-x-auto text-emerald-400 code-block bg-slate-950"><code>from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import precision_recall_curve
+
+nb = GaussianNB()
+nb.fit(X_train, y_train)
+
+y_scores = nb.predict_proba(X_test)[:, 1]
+precision, recall, _ = precision_recall_curve(y_test, y_scores)</code></pre>
+                    </div>
+                </div>
+
+                <!-- 習題 -->
+                <div class="border-l-4 border-indigo-500 bg-indigo-950/20 p-4 rounded-r-xl my-4 text-sm">
+                    <p class="font-bold text-indigo-400 mb-1">思考與習題：</p>
+                    <p class="text-slate-300">單純貝氏算法中，如果測試集中某個特徵在某類別下的出現概率為 0（例如某個詞彙未在垃圾郵件中見過），為什麼會導致聯合預測機率直接歸
+                        0？如何引入拉普拉斯平滑（Laplace Smoothing）來解圍？</p>
+                </div>
+            </section>
+
+            <!-- 9. 梯度提升樹與訓練收斂線 -->
+            <section id="ch9" class="mb-20 page-break">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl font-black font-mono text-indigo-500">09</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white">梯度提升樹與訓練收斂線 (Loss Reduction)</h2>
+                </div>
+
+                <div
+                    class="prose prose-invert max-w-none text-slate-300 text-sm md:text-base leading-relaxed space-y-4">
+                    <p>
+                        <strong>梯度提升樹（Gradient Boosting Tree，如 XGBoost、LightGBM）</strong>採用加法模型（Additive
+                        Training）與前向分步算法，通過擬合上一步弱分類器的殘差或負梯度，逐步逼近最佳極限。
+                    </p>
+                    <p>以 XGBoost 為例，其優化目標包含了二階泰勒展開式的損失與樹結構正則化懲罰項：</p>
+                    <div class="my-4 py-3 px-4 bg-slate-900 rounded-lg text-center font-mono">
+                        $$\mathcal{L}^{(t)} \approx \sum_{i=1}^{N} \left[ g_i f_t(x_i) + \frac{1}{2} h_i f_t^2(x_i)
+                        \right] + \gamma T + \frac{1}{2} \lambda \sum_{j=1}^{T} w_j^2$$
+                    </div>
+                    <p>
+                        <strong>損失收斂線</strong>：觀察隨着弱分類器迭代樹（Boosting Iterations / Trees）的增加，訓練集與驗證集 Loss 的下降趨勢。若驗證集的 Loss
+                        下降後又開始上揚，則代表在此迭代點開始發生**過擬合（Overfitting）**，應當在此點進行早停（Early Stopping）。
+                    </p>
+                </div>
+
+                <!-- 互動圖表 -->
+                <div class="my-8 bg-slate-900 border border-slate-800 p-6 rounded-xl">
+                    <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase">訓練集與驗證集 Boosting 迭代收斂曲線圖 (早停點提示)</h4>
+                    <div class="h-72"><canvas id="canvasCh9Boosting"></canvas></div>
+                </div>
+
+                <!-- Python實作 -->
+                <div class="my-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                        <div
+                            class="bg-slate-800/80 px-4 py-2 text-xs font-bold text-slate-300 flex justify-between items-center border-b border-slate-700">
+                            <span><i class="fa-brands fa-python mr-1 text-yellow-500"></i> xgboost_earlystop.py</span>
+                            <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded">實作代碼</span>
+                        </div>
+                        <pre class="p-4 text-xs overflow-x-auto text-emerald-400 code-block bg-slate-950"><code>import xgboost as xgb
+
+model = xgb.XGBClassifier(n_estimators=1000, max_depth=6)
+# 在驗證集上若 10 次迭代 Loss 未下降則早停
+model.fit(X_train, y_train, 
+          eval_set=[(X_test, y_test)], 
+          early_stopping_rounds=10, 
+          verbose=False)</code></pre>
+                    </div>
+                </div>
+
+                <!-- 習題 -->
+                <div class="border-l-4 border-indigo-500 bg-indigo-950/20 p-4 rounded-r-xl my-4 text-sm">
+                    <p class="font-bold text-indigo-400 mb-1">思考與習題：</p>
+                    <p class="text-slate-300">
+                        與隨機森林可以同時並行計算每棵樹不同，為什麼標準梯度提升算法（Boosting）在多節點計算機群上很難直接對樹的訓練進行並行加速？它是如何克服此計算障礙的？</p>
+                </div>
+            </section>
+
+            <!-- 10. 神經網路與學習曲線 -->
+            <section id="ch10" class="mb-20 page-break">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-2xl font-black font-mono text-indigo-500">10</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white">神經網路與學習曲線 (Learning Curve)</h2>
+                </div>
+
+                <div
+                    class="prose prose-invert max-w-none text-slate-300 text-sm md:text-base leading-relaxed space-y-4">
+                    <p>
+                        <strong>人工神經網路（Artificial Neural Networks,
+                            ANN）</strong>利用多層神經元與激活函數，理論上可逼近任意複雜度的連續非線性函數。模型的核心優化基礎是**反向傳播（Backpropagation）**與鏈式法則（Chain
+                        Rule）求導。
+                    </p>
+                    <p>
+                        <strong>深度解碼學習曲線（Learning Curve）</strong>：比較訓練集表現（Training Score）與交叉驗證集表現（Cross-Validation
+                        Score）隨訓練樣本容量增加的趨勢，可以有效為模型進行診斷：
+                    </p>
+                    <ul class="list-disc list-inside space-y-2 mt-2">
+                        <li><strong>高偏差 (欠擬合, Underfitting)</strong>：兩條曲線在偏低水準的評分處迅速貼靠。即便增加訓練樣本數，表現也無法顯著提升。</li>
+                        <li><strong>高方差 (過擬合, Overfitting)</strong>：訓練集表現持續維持高位，但驗證集表現明顯落後，兩條線之間存有巨大鴻溝
+                            (Gap)。此時引入更多樣本有助於逼合間隔。</li>
+                    </ul>
+                </div>
+
+                <!-- 互動圖表 -->
+                <div class="my-8 bg-slate-900 border border-slate-800 p-6 rounded-xl">
+                    <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase">樣本大小 vs 準確度之學習曲線診斷圖</h4>
+                    <div class="h-72"><canvas id="canvasCh10Learning"></canvas></div>
+                </div>
+
+                <!-- Python實作 -->
+                <div class="my-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                        <div
+                            class="bg-slate-800/80 px-4 py-2 text-xs font-bold text-slate-300 flex justify-between items-center border-b border-slate-700">
+                            <span><i class="fa-brands fa-python mr-1 text-yellow-500"></i> mlp_learning_curve.py</span>
+                            <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded">實作代碼</span>
+                        </div>
+                        <pre class="p-4 text-xs overflow-x-auto text-emerald-400 code-block bg-slate-950"><code>from sklearn.model_selection import learning_curve
+from sklearn.neural_network import MLPClassifier
+
+mlp = MLPClassifier(hidden_layer_sizes=(100, 50), max_iter=500)
+
+# 自動獲取在不同訓練樣本長度下的準確度軌跡
+train_sizes, train_scores, test_scores = learning_curve(
+    mlp, X, y, cv=5, train_sizes=np.linspace(0.1, 1.0, 10)
+)</code></pre>
+                    </div>
+                </div>
+
+                <!-- 習題 -->
+                <div class="border-l-4 border-indigo-500 bg-indigo-950/20 p-4 rounded-r-xl my-4 text-sm">
+                    <p class="font-bold text-indigo-400 mb-1">思考與習題：</p>
+                    <p class="text-slate-300">當神經網路過擬合時，在交叉驗證得分與訓練集得分的空間圖上，我們會觀察到什麼特徵？在結構中引入 L1/L2 正則化（Weight Decay）或
+                        Dropout 為什麼能有效克服該現象？</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-12 text-center text-xs text-slate-500 no-print">
+        <p class="mb-2">機器學習 10 大經典圖表與模型評估深度解析手冊 • 2026年學術特製</p>
+        <p>本教材支持直接保存，按鍵 CTRL+P 可一鍵導出標準高解像 PDF 實體檔案。</p>
+    </footer>
+
+    <!-- 10種圖表動態實時初始化腳本 -->
+    <script>
+        // 切換主題功能
+        let darkTheme = true;
+        function toggleTheme() {
+            darkTheme = !darkTheme;
+            const body = document.body;
+            const themeText = document.getElementById('theme-text');
+
+            if (!darkTheme) {
+                // 學術白紙模式
+                body.classList.remove('bg-slate-950', 'text-slate-100');
+                body.classList.add('bg-white', 'text-slate-900');
+                themeText.innerText = "極客暗黑模式";
+
+                // 修改 Chart 全局顏色為黑色系
+                Chart.defaults.color = '#334155';
+                Chart.defaults.borderColor = '#e2e8f0';
+            } else {
+                // 暗黑極客模式
+                body.classList.remove('bg-white', 'text-slate-900');
+                body.classList.add('bg-slate-950', 'text-slate-100');
+                themeText.innerText = "學術白紙模式";
+
+                // 修改 Chart 全局顏色為亮色系
+                Chart.defaults.color = '#94a3b8';
+                Chart.defaults.borderColor = 'rgba(51, 65, 85, 0.4)';
+            }
+            // 重建全部圖表
+            rebuildAllCharts();
+        }
+
+        // 統一定義配色
+        const colors = {
+            indigo: '#6366f1',
+            emerald: '#10b981',
+            rose: '#f43f5e',
+            yellow: '#eab308',
+            sky: '#0ea5e9',
+            purple: '#a855f7',
+            slateBorder: 'rgba(51, 65, 85, 0.4)',
+            slateText: '#94a3b8'
+        };
+
+        Chart.defaults.color = colors.slateText;
+        Chart.defaults.borderColor = colors.slateBorder;
+        Chart.defaults.font.family = "'Noto Sans TC', sans-serif";
+
+        let instances = {};
+
+        function rebuildAllCharts() {
+            // 銷毀現有實例
+            Object.keys(instances).forEach(key => {
+                if (instances[key]) instances[key].destroy();
+            });
+
+            const textClr = darkTheme ? '#94a3b8' : '#334155';
+            const borderClr = darkTheme ? 'rgba(51, 65, 85, 0.4)' : '#e2e8f0';
+
+            // --- 01. 線性迴歸系列圖表 ---
+            const ch1FitPoints = Array.from({ length: 30 }, (_, i) => {
+                const x = i + 1;
+                const noise = (Math.random() - 0.5) * 8;
+                return { x: x, y: parseFloat((1.2 * x + 5 + noise).toFixed(2)) };
+            });
+            instances.ch1Fit = new Chart(document.getElementById('canvasCh1Fit').getContext('2d'), {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: '真實觀測樣本', data: ch1FitPoints, backgroundColor: colors.sky },
+                        { label: '最佳擬合線 (y=1.2x+5)', data: [{ x: 0, y: 5 }, { x: 32, y: 1.2 * 32 + 5 }], type: 'line', borderColor: colors.yellow, borderWidth: 3, pointRadius: 0 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: textClr } } }, scales: { x: { grid: { color: borderClr } }, y: { grid: { color: borderClr } } } }
+            });
+
+            const ch1ResPoint = ch1FitPoints.map(pt => ({
+                x: pt.x,
+                y: parseFloat((pt.y - (1.2 * pt.x + 5)).toFixed(2))
+            }));
+            instances.ch1Res = new Chart(document.getElementById('canvasCh1Residual').getContext('2d'), {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: '殘差誤差點', data: ch1ResPoint, backgroundColor: colors.purple },
+                        { label: '基準線 (e = 0)', data: [{ x: 0, y: 0 }, { x: 32, y: 0 }], type: 'line', borderColor: colors.rose, borderDash: [5, 5], pointRadius: 0 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: borderClr } }, y: { min: -10, max: 10, grid: { color: borderClr } } } }
+            });
+
+            // --- 02. ROC ---
+            const rocPts = [];
+            for (let f = 0; f <= 1.05; f += 0.05) {
+                rocPts.push({ x: parseFloat(f.toFixed(2)), y: parseFloat(Math.pow(f, 0.18).toFixed(2)) });
+            }
+            instances.ch2Roc = new Chart(document.getElementById('canvasCh2ROC').getContext('2d'), {
+                type: 'line',
+                data: {
+                    datasets: [
+                        { label: '分類器表現 (AUC = 0.92)', data: rocPts, borderColor: colors.emerald, borderWidth: 3, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.05)' },
+                        { label: '隨機盲猜基準線 (AUC = 0.50)', data: [{ x: 0, y: 0 }, { x: 1, y: 1 }], borderColor: colors.rose, borderDash: [4, 4], pointRadius: 0 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 1, grid: { color: borderClr } }, y: { min: 0, max: 1.05, grid: { color: borderClr } } } }
+            });
+
+            // --- 03. 決策樹邊界 ---
+            const catA = [];
+            const catB = [];
+            for (let i = 0; i < 20; i++) {
+                catA.push({ x: Math.random() * 4 + 1, y: Math.random() * 4 + 1 });
+                catB.push({ x: Math.random() * 4 + 5, y: Math.random() * 4 + 5 });
+            }
+            instances.ch3Bound = new Chart(document.getElementById('canvasCh3Boundary').getContext('2d'), {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: '類別 A', data: catA, backgroundColor: colors.rose },
+                        { label: '類別 B', data: catB, backgroundColor: colors.sky },
+                        // 手工繪製階梯劃分線
+                        { label: '決策樹正交劃分邊界', data: [{ x: 4.5, y: 0 }, { x: 4.5, y: 4.5 }, { x: 9, y: 4.5 }], type: 'line', borderColor: colors.emerald, borderWidth: 2, borderDash: [5, 5], pointRadius: 0 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 9, grid: { color: borderClr } }, y: { min: 0, max: 9, grid: { color: borderClr } } } }
+            });
+
+            // --- 04. 特徵重要性 ---
+            instances.ch4Imp = new Chart(document.getElementById('canvasCh4Importance').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['年齡 (Age)', '年收入 (Income)', '信用分數 (CreditScore)', '儲蓄金額 (Savings)', '債務比 (DebtRatio)', '就業狀態 (Employment)'],
+                    datasets: [{
+                        label: 'Gini 貢獻度權重',
+                        data: [0.35, 0.25, 0.18, 0.12, 0.07, 0.03],
+                        backgroundColor: [colors.indigo, colors.emerald, colors.sky, colors.yellow, colors.rose, '#64748b']
+                    }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: borderClr } }, y: { grid: { display: false } } } }
+            });
+
+            // --- 05. SVM Margin ---
+            instances.ch5SVM = new Chart(document.getElementById('canvasCh5SVM').getContext('2d'), {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: '正類', data: [{ x: 2, y: 6 }, { x: 2.5, y: 7 }, { x: 1, y: 5 }, { x: 3, y: 8 }], backgroundColor: colors.sky },
+                        { label: '負類', data: [{ x: 5, y: 3 }, { x: 6, y: 4 }, { x: 4, y: 2 }, { x: 7, y: 2.5 }], backgroundColor: colors.rose },
+                        // 支持向量線
+                        { label: '最大間隔超平面 (Hyperplane)', data: [{ x: 1, y: 4.5 }, { x: 7, y: 4.5 }], type: 'line', borderColor: colors.yellow, borderWidth: 3, pointRadius: 0 },
+                        { label: 'Margin +1 線', data: [{ x: 1, y: 5.5 }, { x: 7, y: 5.5 }], type: 'line', borderColor: colors.slateText, borderDash: [5, 5], pointRadius: 0 },
+                        { label: 'Margin -1 線', data: [{ x: 1, y: 3.5 }, { x: 7, y: 3.5 }], type: 'line', borderColor: colors.slateText, borderDash: [5, 5], pointRadius: 0 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 8, grid: { color: borderClr } }, y: { min: 0, max: 9, grid: { color: borderClr } } } }
+            });
+
+            // --- 06. KNN ---
+            instances.ch6KNN = new Chart(document.getElementById('canvasCh6KNN').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: [1, 3, 5, 7, 9, 11, 15, 21, 31],
+                    datasets: [
+                        { label: '訓練集錯誤率 (極低)', data: [0.0, 0.04, 0.06, 0.08, 0.09, 0.11, 0.14, 0.18, 0.22], borderColor: colors.rose, tension: 0.2 },
+                        { label: '交叉驗證集錯誤率 (完美U型)', data: [0.18, 0.11, 0.07, 0.06, 0.08, 0.10, 0.13, 0.19, 0.24], borderColor: colors.sky, tension: 0.2 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: borderClr } }, y: { grid: { color: borderClr } } } }
+            });
+
+            // --- 07. K-Means / Elbow ---
+            const g1 = []; const g2 = []; const g3 = [];
+            for (let i = 0; i < 15; i++) {
+                g1.push({ x: 2 + Math.random() * 1.5, y: 6 + Math.random() * 1.5 });
+                g2.push({ x: 6 + Math.random() * 1.5, y: 5 + Math.random() * 1.5 });
+                g3.push({ x: 4 + Math.random() * 1.5, y: 2 + Math.random() * 1.5 });
+            }
+            instances.ch7Clust = new Chart(document.getElementById('canvasCh7Clust').getContext('2d'), {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: '群簇一', data: g1, backgroundColor: colors.sky },
+                        { label: '群簇二', data: g2, backgroundColor: colors.rose },
+                        { label: '群簇三', data: g3, backgroundColor: colors.purple },
+                        { label: '三簇質心 (X)', data: [{ x: 2.75, y: 6.75 }, { x: 6.75, y: 5.75 }, { x: 4.75, y: 2.75 }], pointStyle: 'crossRot', radius: 10, borderWidth: 3, borderColor: '#fff', backgroundColor: '#fff' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 9, grid: { color: borderClr } }, y: { min: 0, max: 9, grid: { color: borderClr } } } }
+            });
+
+            instances.ch7Elbow = new Chart(document.getElementById('canvasCh7Elbow').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: [1, 2, 3, 4, 5, 6, 7, 8],
+                    datasets: [{ label: '群內平方誤差和 (WCSS)', data: [1500, 850, 210, 160, 120, 90, 70, 55], borderColor: colors.indigo, borderWidth: 3, tension: 0.1 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: borderClr } }, y: { grid: { color: borderClr } } } }
+            });
+
+            // --- 08. PR Curve ---
+            const prPts = [];
+            for (let r = 0; r <= 1.01; r += 0.05) {
+                prPts.push({ x: parseFloat(r.toFixed(2)), y: parseFloat((1 - Math.pow(r, 4) * 0.4).toFixed(2)) });
+            }
+            instances.ch8PR = new Chart(document.getElementById('canvasCh8PR').getContext('2d'), {
+                type: 'line',
+                data: {
+                    datasets: [
+                        { label: '單純貝氏分類器 (AP = 0.88)', data: prPts, borderColor: colors.purple, borderWidth: 3, fill: true, backgroundColor: 'rgba(168, 85, 247, 0.05)' },
+                        { label: '少數正類比重基準線 (無偏 = 0.10)', data: [{ x: 0, y: 0.1 }, { x: 1, y: 0.1 }], borderColor: colors.rose, borderDash: [4, 4], pointRadius: 0 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 1, grid: { color: borderClr } }, y: { min: 0, max: 1.05, grid: { color: borderClr } } } }
+            });
+
+            // --- 09. Boosting Loss ---
+            instances.ch9Boosting = new Chart(document.getElementById('canvasCh9Boosting').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: [0, 10, 20, 30, 40, 50, 70, 100, 150, 200],
+                    datasets: [
+                        { label: '訓練集損失 (過度收斂)', data: [0.9, 0.6, 0.4, 0.25, 0.18, 0.12, 0.07, 0.03, 0.01, 0.002], borderColor: colors.rose },
+                        { label: '驗證集損失 (30處最優，隨後反彈)', data: [0.92, 0.65, 0.44, 0.35, 0.36, 0.39, 0.45, 0.55, 0.70, 0.85], borderColor: colors.sky }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: borderClr } }, y: { grid: { color: borderClr } } } }
+            });
+
+            // --- 10. Learning Curve ---
+            instances.ch10Learn = new Chart(document.getElementById('canvasCh10Learning').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: [100, 500, 1000, 2000, 5000, 10000, 20000],
+                    datasets: [
+                        { label: '訓練集表現 (過擬合下降趨勢)', data: [0.99, 0.98, 0.96, 0.95, 0.942, 0.938, 0.935], borderColor: colors.rose },
+                        { label: '交叉驗證集表現 (緩慢逼合)', data: [0.65, 0.72, 0.82, 0.88, 0.91, 0.922, 0.925], borderColor: colors.emerald }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: borderClr } }, y: { min: 0.5, max: 1.02, grid: { color: borderClr } } } }
+            });
+        }
+
+        window.onload = function () {
+            rebuildAllCharts();
+        }
+    </script>
+</body>
+
+</html>

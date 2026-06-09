@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.venv_uv/
+.venv_old/
+venv/
+ENV/
+env/
+backend/database.db
+backend/database.db-journal
+
+# Next.js / Node
+node_modules/
+.next/
+out/
+build/
+.env
+.env*.local
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
