@@ -195,7 +195,8 @@ menu_options = [
     "📚 8. 單純貝氏與 PR 曲線",
     "📚 9. 梯度提升樹與訓練收斂",
     "📚 10. 神經網路與學習曲線",
-    "📝 隨堂測驗練習"
+    "📝 隨堂測驗練習",
+    "📋 專案開發工作日誌"
 ]
 
 selected_menu = st.sidebar.radio("導覽目錄", menu_options)
@@ -285,6 +286,22 @@ if selected_menu == "📝 隨堂測驗練習":
                 prog = load_progress(key)
                 save_progress(key, prog['study_completed'], 1, prog['playground_completed'])
             st.toast("已為您自動同步更新資料庫中所有章節的『測驗進度』！")
+
+elif selected_menu == "📋 專案開發工作日誌":
+    st.title("📋 專案開發工作日誌 (log.md)")
+    st.write("本工作日誌記錄了本專案從系統設計、資料結構化、UI/UX 極致優化、單端 Streamlit 重構、資料庫整合至最後正式部署的所有開發里程碑與細節。")
+    
+    # 讀取並顯示 log.md 內容
+    log_path = os.path.join(os.path.dirname(__file__), "log.md")
+    if os.path.exists(log_path):
+        try:
+            with open(log_path, "r", encoding="utf-8") as f:
+                log_content = f.read()
+            st.markdown(log_content)
+        except Exception as e:
+            st.error(f"讀取 log.md 時發生錯誤: {e}")
+    else:
+        st.warning("在本機找不到 log.md 檔案。")
 
 # -----------------------------------------------------------------------------
 # 演算法動態學習面板
